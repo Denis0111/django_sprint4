@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from core.constants import FIELDS_MAX_LENGTH, STR_LENGTH
-from core.models import IsPublishedAndCreatedAt
+from core.models import CreatedAt, IsPublishedAndCreatedAt
 
 
 User = get_user_model()
@@ -95,18 +95,14 @@ class Post(IsPublishedAndCreatedAt):
         return self.title[:STR_LENGTH]
 
 
-class Comment(models.Model):
+class Comment(CreatedAt):
     text = models.TextField('Текст комментария')
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comment',
-        verbose_name='публикация'
+        verbose_name='Публикация'
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Добавлено'
-    )
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -116,7 +112,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
-        ordering = ('created_at',)
+        default_related_name = 'comments'
 
     def __str__(self):
-        return f"Комментарий пользователя {self.author}"
+        return f'Комментарий пользователя {self.author}'
